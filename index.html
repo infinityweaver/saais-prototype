@@ -718,7 +718,7 @@ function sheet(title, pages) {
   const pageNo = i => `<div class="ctl">Page ${i + 1} of ${n}</div>`;
   const letterhead = `<div class="lh"><div class="img" style="width:50px;height:50px">Bagong Pilipinas logo</div><div class="img" style="width:168px;height:52px">VSU Brand Logo + Text Logo</div>${office ? `<div class="bar"></div><div class="off"><div class="op">${office.prefix}</div>${office.name.map(l => `<div class="on">${l}</div>`).join("")}</div>` : ""}</div>`;
   const foot1 = i => `<div class="pf f1">${office ? `${office.logo ? `<div class="img round" style="width:44px;height:44px">Office logo</div>` : ""}<div class="contact">${office.contact.join("<br>")}</div>` : `<div class="contact"></div>`}
-      <div class="img" style="width:96px;height:46px">ISO 9001:2015 (TÜV Rheinland) badge</div><div class="img" style="width:68px;height:40px">QS Stars badge</div>${pageNo(i)}</div>`;
+      ${pageNo(i)}</div>`;
   const foot2 = i => `<div class="pf f2"><div class="vm"><b>Vision:</b><span>${VISION}</span><b>Mission:</b><span>${MISSION}</span></div>${pageNo(i)}</div>`;
   return pages.map((body, i) => `<div class="sheet-wrap"><div class="sheet">${WATERMARK}
     ${i === 0 ? letterhead + `<div class="dt">${title}</div>` : ""}
