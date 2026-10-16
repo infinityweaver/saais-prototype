@@ -1,0 +1,818 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAAIS Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* VSU Brand Book web colors */
+    --vsu-dark-green: #17321A;
+    --vsu-green: #146939;
+    --vsu-light-green: #00954F;
+    --vsu-golden-yellow: #FDC530;
+    --vsu-corn-yellow: #FCD83D;
+    --vsu-yellow: #FFE800;
+
+    --bg: #F5F7F5;
+    --surface: #FFFFFF;
+    --text: #1C241D;
+    --muted: #5B6B5E;
+    --border: #DCE3DD;
+    --red: #B42318;
+    --red-bg: #FDECEA;
+    --amber: #8A5A00;
+    --amber-bg: #FFF4D6;
+    --blue: #1D4E89;
+    --blue-bg: #E6EEF8;
+    --green-bg: #E3F4EA;
+    --gray-bg: #EEF0EE;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { font-family: Roboto, Arial, sans-serif; color: var(--text); background: var(--bg); font-size: 15px; line-height: 1.45; }
+  h1, h2, h3, .brand { font-family: Montserrat, Arial, sans-serif; font-weight: 600; }
+  h1 { font-size: 1.45rem; margin: 0 0 4px; }
+  h2 { font-size: 1.1rem; margin: 0 0 10px; }
+  h3 { font-size: 0.98rem; margin: 0; }
+  a { color: var(--vsu-green); }
+  button, select, input, textarea { font: inherit; }
+
+  .proto-bar { background: var(--vsu-golden-yellow); color: var(--vsu-dark-green); padding: 6px 16px; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; font-size: 13px; }
+  .proto-bar strong { font-family: Montserrat, Arial, sans-serif; }
+  .proto-bar select { padding: 3px 6px; border: 1px solid var(--vsu-dark-green); border-radius: 6px; background: #fff; }
+
+  header.app { background: var(--vsu-dark-green); color: #fff; display: flex; align-items: center; gap: 12px; padding: 10px 16px; position: sticky; top: 0; z-index: 20; }
+  .logo-ph { width: 34px; height: 34px; border: 1.5px dashed var(--vsu-golden-yellow); border-radius: 6px; display: grid; place-items: center; font-size: 9px; color: var(--vsu-golden-yellow); text-align: center; line-height: 1; flex: none; }
+  .brand { font-size: 1.05rem; line-height: 1.1; }
+  .brand small { display: block; font-family: Roboto, Arial, sans-serif; font-weight: 400; font-size: 11px; color: #CFE3D3; }
+  header.app .spacer { flex: 1; }
+  .icon-btn { background: transparent; border: 0; color: #fff; cursor: pointer; position: relative; padding: 6px; border-radius: 6px; }
+  .icon-btn:hover { background: rgba(255,255,255,.1); }
+  .badge-count { position: absolute; top: 0; right: 0; background: var(--vsu-golden-yellow); color: var(--vsu-dark-green); font-size: 10px; font-weight: 700; border-radius: 10px; padding: 0 5px; }
+  .user-chip { font-size: 13px; text-align: right; line-height: 1.2; }
+  .user-chip small { color: #CFE3D3; display: block; }
+  #menuBtn { display: none; }
+
+  .shell { display: flex; min-height: calc(100vh - 90px); }
+  nav.side { width: 240px; flex: none; background: var(--surface); border-right: 1px solid var(--border); padding: 12px 0; }
+  nav.side .group { font-family: Montserrat, Arial, sans-serif; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 12px 18px 4px; }
+  nav.side a { display: block; padding: 8px 18px; color: var(--text); text-decoration: none; border-left: 3px solid transparent; }
+  nav.side a:hover { background: var(--bg); }
+  nav.side a.active { border-left-color: var(--vsu-golden-yellow); background: var(--green-bg); color: var(--vsu-dark-green); font-weight: 500; }
+  main { flex: 1; min-width: 0; padding: 20px 24px 48px; }
+  .page-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 10px; margin-bottom: 16px; }
+  .sub { color: var(--muted); font-size: 13.5px; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 16px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; border-top: 3px solid var(--vsu-green); }
+  .stat .label { font-size: 12px; color: var(--muted); }
+  .stat .value { font-family: Montserrat, Arial, sans-serif; font-size: 1.35rem; font-weight: 600; }
+  .stat.warn { border-top-color: var(--vsu-golden-yellow); }
+
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--vsu-green); background: var(--vsu-green); color: #fff; cursor: pointer; font-weight: 500; text-decoration: none; }
+  .btn:hover { background: var(--vsu-dark-green); }
+  .btn.secondary { background: #fff; color: var(--vsu-green); }
+  .btn.secondary:hover { background: var(--green-bg); }
+  .btn.danger { background: #fff; color: var(--red); border-color: var(--red); }
+  .btn.small { padding: 4px 10px; font-size: 13px; }
+  .row-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { font-size: 12px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .03em; }
+  tr.clickable { cursor: pointer; }
+  tr.clickable:hover td { background: var(--bg); }
+  .num { text-align: right; white-space: nowrap; }
+  .code { font-weight: 500; white-space: nowrap; }
+
+  .chip { display: inline-block; padding: 1px 8px; border-radius: 10px; font-size: 12px; font-weight: 500; white-space: nowrap; }
+  .chip.passed { background: var(--green-bg); color: var(--vsu-green); }
+  .chip.failed { background: var(--red-bg); color: var(--red); }
+  .chip.inc { background: var(--amber-bg); color: var(--amber); }
+  .chip.dropped, .chip.notcredited { background: var(--gray-bg); color: var(--muted); }
+  .chip.ongoing { background: var(--blue-bg); color: var(--blue); }
+  .chip.nottaken { background: #fff; color: var(--muted); border: 1px solid var(--border); }
+  .chip.open { background: var(--amber-bg); color: var(--amber); }
+  .chip.gold { background: var(--vsu-corn-yellow); color: var(--vsu-dark-green); }
+
+  details.sem { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+  details.sem summary { cursor: pointer; padding: 12px 16px; display: flex; justify-content: space-between; gap: 8px; align-items: center; list-style: none; }
+  details.sem summary::-webkit-details-marker { display: none; }
+  details.sem summary::before { content: "▸"; color: var(--vsu-green); margin-right: 6px; }
+  details.sem[open] summary::before { content: "▾"; }
+  details.sem summary .t { flex: 1; font-family: Montserrat, Arial, sans-serif; font-weight: 600; }
+  details.sem .body { border-top: 1px solid var(--border); }
+
+  .tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--border); margin-bottom: 16px; overflow-x: auto; }
+  .tabs a { padding: 8px 14px; text-decoration: none; color: var(--muted); border-bottom: 3px solid transparent; white-space: nowrap; }
+  .tabs a.active { color: var(--vsu-dark-green); border-bottom-color: var(--vsu-golden-yellow); font-weight: 500; }
+
+  label.f { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  .input, select.input, textarea.input { width: 100%; padding: 7px 9px; border: 1px solid var(--border); border-radius: 7px; background: #fff; }
+  .input.invalid { border-color: var(--red); background: var(--red-bg); }
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 12px; }
+  .hint { font-size: 12.5px; color: var(--muted); }
+  .err { font-size: 12.5px; color: var(--red); }
+  .notice { padding: 10px 14px; border-radius: 8px; margin-bottom: 14px; font-size: 14px; }
+  .notice.warn { background: var(--amber-bg); color: var(--amber); }
+  .notice.info { background: var(--blue-bg); color: var(--blue); }
+  .notice.ok { background: var(--green-bg); color: var(--vsu-green); }
+  .drop { border: 2px dashed var(--border); border-radius: 10px; padding: 28px; text-align: center; color: var(--muted); }
+  .bar { height: 14px; background: var(--vsu-green); border-radius: 3px; }
+  .bar.gold { background: var(--vsu-golden-yellow); }
+
+  .modal-bg { position: fixed; inset: 0; background: rgba(23,50,26,.45); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 50; }
+  .modal-bg.show { display: flex; }
+  .modal { background: #fff; border-radius: 12px; max-width: 560px; width: 100%; max-height: 90vh; overflow: auto; padding: 18px; }
+  .modal .close { float: right; }
+  .toast { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); background: var(--vsu-dark-green); color: #fff; padding: 10px 16px; border-radius: 8px; display: none; z-index: 60; }
+
+  .signin { max-width: 380px; margin: 8vh auto; text-align: center; }
+  .signin .logo-ph { width: 72px; height: 72px; margin: 0 auto 12px; border-color: var(--vsu-green); color: var(--vsu-green); font-size: 11px; }
+  .gbtn { display: inline-flex; gap: 10px; align-items: center; border: 1px solid var(--border); padding: 10px 16px; border-radius: 8px; background: #fff; cursor: pointer; font-weight: 500; }
+
+  /* Phones: sidebar becomes a slide-down menu, tables become cards */
+  @media (max-width: 760px) {
+    #menuBtn { display: inline-block; }
+    .user-chip { display: none; }
+    nav.side { position: fixed; top: 90px; left: 0; right: 0; bottom: 0; width: auto; z-index: 30; display: none; overflow: auto; }
+    nav.side.open { display: block; }
+    main { padding: 16px 16px 40px; }
+    table.stack thead { display: none; }
+    table.stack, table.stack tbody, table.stack tr, table.stack td { display: block; width: 100%; }
+    table.stack tr { border-bottom: 1px solid var(--border); padding: 8px 0; }
+    table.stack td { border: 0; padding: 2px 12px; }
+    table.stack td[data-l]::before { content: attr(data-l) ": "; color: var(--muted); font-size: 12px; }
+    table.stack td:nth-child(-n+2)::before { content: none; }
+    table.stack td:first-child { font-weight: 500; }
+    table.stack td.num { text-align: left; }
+  }
+
+  /* PDF preview: an A4 sheet (794 x 1123 px at 96 dpi) scaled to fit the screen */
+  .pdf-bg { position: fixed; inset: 0; background: #59625B; z-index: 70; overflow: auto; display: none; padding: 0 16px 32px; }
+  .pdf-bg.show { display: block; }
+  .pdf-bar { position: sticky; top: 0; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: space-between; padding: 10px 0; color: #fff; background: #59625B; z-index: 1; }
+  .sheet-wrap { margin: 0 auto 16px; width: calc(794px * var(--s, 1)); height: calc(1123px * var(--s, 1)); }
+  .sheet { width: 794px; height: 1123px; background: #fff; color: #111; transform: scale(var(--s, 1)); transform-origin: top left; padding: 34px 40px 26px; display: flex; flex-direction: column; font-family: Roboto, Arial, sans-serif; font-size: 8.6px; line-height: 1.3; box-shadow: 0 2px 10px rgba(0,0,0,.3); }
+  .sheet { position: relative; overflow: hidden; }
+  .sheet > * { position: relative; }
+  .sheet .wm { position: absolute; left: -150px; bottom: 60px; width: 560px; height: 560px; }
+  .sheet .img { border: 1px dashed #9DB3A2; color: #6F8574; font-size: 7px; display: grid; place-items: center; text-align: center; line-height: 1.15; padding: 2px; flex: none; }
+  .sheet .img.round { border-radius: 50%; }
+  /* Letterhead: Bagong Pilipinas, VSU logo, green divider, office name (as on the DCST minutes and FC memos) */
+  .sheet .lh { display: flex; align-items: center; gap: 10px; padding: 4px 0 4px 26px; }
+  .sheet .lh .bar { width: 2px; height: 56px; background: var(--vsu-green); margin: 0 4px; }
+  .sheet .lh .off { font-family: Montserrat, Arial, sans-serif; color: var(--vsu-green); }
+  .sheet .lh .op { font-size: 13px; font-weight: 500; line-height: 1.1; }
+  .sheet .lh .on { font-size: 19px; font-weight: 700; line-height: 1.05; }
+  .sheet .dt { font-family: Montserrat, Arial, sans-serif; font-weight: 600; font-size: 12px; text-align: center; margin: 10px 0 6px; letter-spacing: .04em; }
+  .sheet .cont { font-size: 8px; color: #555; margin-bottom: 6px; }
+  .sheet .meta { font-size: 7.2px; color: #555; margin-top: 6px; }
+  .sheet .pf { display: flex; align-items: center; gap: 10px; padding-top: 6px; font-size: 7.4px; color: #222; }
+  .sheet .pf .contact { flex: 1; line-height: 1.25; }
+  .sheet .pf .ctl { width: 92px; text-align: center; font-style: italic; font-size: 7.6px; align-self: flex-end; }
+  .sheet .f2 .vm { flex: 1; display: grid; grid-template-columns: auto 1fr; gap: 1px 12px; line-height: 1.25; }
+  .sheet .info { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px 14px; margin-bottom: 6px; }
+  .sheet .info b { font-weight: 500; }
+  .sheet .sumrow { display: flex; flex-wrap: wrap; gap: 4px 14px; background: #F1F6F2; border: 1px solid #CFDCD2; padding: 4px 8px; margin-bottom: 7px; }
+  .sheet .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; align-content: start; }
+  .sheet table { border-collapse: collapse; width: 100%; }
+  .sheet th, .sheet td { border: 0.6px solid #B9C4BB; padding: 1.5px 3px; text-align: left; font-size: 8.2px; text-transform: none; letter-spacing: 0; color: #111; }
+  .sheet th { background: #E6EFE8; font-weight: 500; }
+  .sheet td:first-child { white-space: nowrap; }
+  .sheet .slot-h { background: var(--vsu-dark-green); color: #fff; padding: 2px 4px; display: flex; justify-content: space-between; gap: 6px; font-weight: 500; }
+  .sheet .n { text-align: right; white-space: nowrap; }
+  .sheet .body { flex: 1; }
+  .sheet .sig { display: flex; justify-content: space-around; margin: 10px 0 8px; text-align: center; }
+  .sheet .sig > div { width: 38%; }
+  .sheet .sig .line { border-top: 0.8px solid #111; margin-top: 22px; padding-top: 2px; font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="proto-bar no-print">
+  <strong>Prototype</strong><span>Sample data only. Nothing is saved.</span>
+  <label>View as
+    <select id="roleSel">
+      <option value="student">Student</option>
+      <option value="adviser">Adviser</option>
+      <option value="head">Department Head (also an adviser)</option>
+      <option value="staff">Department staff</option>
+      <option value="dean">Dean (also an adviser)</option>
+      <option value="deanhead">Dean (also an adviser and Department Head)</option>
+      <option value="admin">System administrator</option>
+      <option value="signin">Signed out</option>
+    </select>
+  </label>
+</div>
+
+<div id="app"></div>
+
+<div class="modal-bg" id="modalBg"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ---------- Sample data ----------
+const CURRICULUM_NAME = "BSCS 2025–present";
+const TERM_LABEL = { first_sem: "1st Semester", second_sem: "2nd Semester", midyear: "Midyear" };
+const YEAR_LABEL = ["", "1st Year", "2nd Year", "3rd Year", "4th Year"];
+
+// [code, title, units, category, year, term, thesis?]
+const CURR = [
+  ["GE 1", "Understanding the Self", 3, "GE", 1, "first_sem"],
+  ["GE 2", "Readings in Philippine History", 3, "GE", 1, "first_sem"],
+  ["CSci 11", "Introduction to Computing", 3, "Professional", 1, "first_sem"],
+  ["CSci 12", "Computer Programming 1", 3, "Professional", 1, "first_sem"],
+  ["PE 1", "Physical Fitness", 2, "PE", 1, "first_sem"],
+  ["NSTP 1", "National Service Training Program 1", 3, "NSTP", 1, "first_sem"],
+  ["GE 3", "The Contemporary World", 3, "GE", 1, "second_sem"],
+  ["CSci 13", "Computer Programming 2", 3, "Professional", 1, "second_sem"],
+  ["CSci 14", "Discrete Structures 1", 3, "Professional", 1, "second_sem"],
+  ["PE 2", "Rhythmic Activities", 2, "PE", 1, "second_sem"],
+  ["NSTP 2", "National Service Training Program 2", 3, "NSTP", 1, "second_sem"],
+  ["GE 4", "Mathematics in the Modern World", 3, "GE", 2, "first_sem"],
+  ["CSci 21", "Data Structures and Algorithms", 3, "Professional", 2, "first_sem"],
+  ["CSci 22", "Object-Oriented Programming", 3, "Professional", 2, "first_sem"],
+  ["CSci 23", "Discrete Structures 2", 3, "Professional", 2, "first_sem"],
+  ["PE 3", "Individual and Dual Sports", 2, "PE", 2, "first_sem"],
+  ["GE 5", "Purposive Communication", 3, "GE", 2, "second_sem"],
+  ["CSci 24", "Information Management", 3, "Professional", 2, "second_sem"],
+  ["CSci 25", "Computer Architecture", 3, "Professional", 2, "second_sem"],
+  ["CSci 26", "Algorithms and Complexity", 3, "Professional", 2, "second_sem"],
+  ["PE 4", "Team Sports", 2, "PE", 2, "second_sem"],
+  ["CSci 31", "Operating Systems", 3, "Professional", 3, "first_sem"],
+  ["CSci 32", "Software Engineering 1", 3, "Professional", 3, "first_sem"],
+  ["CSci 33", "Automata Theory", 3, "Professional", 3, "first_sem"],
+  ["CS Elective 1", "Elective slot", 3, "Elective", 3, "first_sem"],
+  ["CSci 34", "Computer Networks", 3, "Professional", 3, "second_sem"],
+  ["CSci 35", "Software Engineering 2", 3, "Professional", 3, "second_sem"],
+  ["CSci 36", "Programming Languages", 3, "Professional", 3, "second_sem"],
+  ["CS Elective 2", "Elective slot", 3, "Elective", 3, "second_sem"],
+  ["CSci 199", "Practicum", 3, "Professional", 3, "midyear"],
+  ["CSci 200a", "Undergraduate Thesis I", 2, "Professional", 4, "first_sem", true],
+  ["CSci 41", "Information Assurance and Security", 3, "Professional", 4, "first_sem"],
+  ["CS Elective 3", "Elective slot", 3, "Elective", 4, "first_sem"],
+  ["CSci 200b", "Undergraduate Thesis II", 4, "Professional", 4, "second_sem", true],
+  ["CSci 42", "Social and Professional Issues", 3, "Professional", 4, "second_sem"],
+].map(([code, title, units, cat, year, term, thesis]) => ({ code, title, units, cat, year, term, thesis: !!thesis }));
+
+// Attempts for the sample student: [code, schoolYear, term, midterm, final, completion, instructor, takenAs]
+const ATTEMPTS = [
+  ["GE 1", "2023–2024", "first_sem", "1.75", "1.50", "", "Prof. Lim"],
+  ["GE 2", "2023–2024", "first_sem", "2.00", "1.75", "", "Prof. Tan"],
+  ["CSci 11", "2023–2024", "first_sem", "1.25", "1.25", "", "Prof. Cruz"],
+  ["CSci 12", "2023–2024", "first_sem", "1.50", "1.50", "", "Prof. Cruz"],
+  ["PE 1", "2023–2024", "first_sem", "1.25", "1.00", "", "Coach Ramos"],
+  ["NSTP 1", "2023–2024", "first_sem", "1.50", "1.25", "", "Prof. Gomez"],
+  ["GE 3", "2023–2024", "second_sem", "2.25", "2.00", "", "Prof. Tan"],
+  ["CSci 13", "2023–2024", "second_sem", "1.75", "1.75", "", "Prof. Cruz"],
+  ["CSci 14", "2023–2024", "second_sem", "3.50", "5.00", "", "Prof. Villa"],
+  ["PE 2", "2023–2024", "second_sem", "1.50", "1.25", "", "Coach Ramos"],
+  ["NSTP 2", "2023–2024", "second_sem", "1.50", "1.50", "", "Prof. Gomez"],
+  ["CSci 14", "2023–2024", "midyear", "2.50", "2.25", "", "Prof. Villa"],
+  ["GE 4", "2024–2025", "first_sem", "2.75", "INC", "2.00", "Prof. Lim"],
+  ["CSci 21", "2024–2025", "first_sem", "1.75", "1.50", "", "Prof. Reyes"],
+  ["CSci 22", "2024–2025", "first_sem", "1.50", "1.75", "", "Prof. Reyes"],
+  ["CSci 23", "2024–2025", "first_sem", "2.00", "2.00", "", "Prof. Villa"],
+  ["PE 3", "2024–2025", "first_sem", "1.25", "1.25", "", "Coach Ramos"],
+  ["GE 5", "2024–2025", "second_sem", "DR", "DR", "", "Prof. Tan"],
+  ["CSci 24", "2024–2025", "second_sem", "1.75", "1.50", "", "Prof. Santos"],
+  ["CSci 25", "2024–2025", "second_sem", "2.25", "2.50", "", "Prof. Villa"],
+  ["CSci 26", "2024–2025", "second_sem", "2.00", "2.25", "", "Prof. Reyes"],
+  ["PE 4", "2024–2025", "second_sem", "1.50", "1.25", "", "Coach Ramos"],
+  ["CSci 31", "2026–2027", "first_sem", "1.75", "", "", "Prof. Santos"],
+  ["CSci 32", "2026–2027", "first_sem", "2.00", "", "", "Prof. Reyes"],
+  ["CSci 33", "2026–2027", "first_sem", "2.25", "", "", "Prof. Villa"],
+  ["CS Elective 1", "2026–2027", "first_sem", "1.50", "", "", "Prof. Santos", "CSci 51 Web Systems and Technologies"],
+].map(([code, sy, term, mid, fin, comp, instr, takenAs]) => ({ code, sy, term, mid, fin, comp, instr, takenAs }));
+
+const ADVISEES = [
+  { name: "Ana Reyes", no: "23-1-01234", year: 2, gwa: "1.72", flags: 1, def: 1, curr: "BSCS 2025–present", adviser: "Prof. Mara Reyes" },
+  { name: "Ben Lopez", no: "23-1-01301", year: 3, gwa: "2.10", flags: 0, def: 3, curr: "BSCS 2025–present", adviser: "Prof. Mara Reyes" },
+  { name: "Carla Mendoza", no: "22-1-00877", year: 4, gwa: "1.58", flags: 0, def: 0, curr: "BSCS 2018–2024", adviser: "Prof. Mara Reyes" },
+  { name: "Dino Castillo", no: "24-1-02011", year: 2, gwa: "2.45", flags: 0, def: 2, curr: "BSCS 2025–present", adviser: "Prof. Mara Reyes" },
+  { name: "Ella Navarro", no: "22-1-00912", year: 4, gwa: "1.91", flags: 0, def: 1, curr: "BSCS 2018–2024", adviser: "Prof. Mara Reyes" },
+];
+const ALL_STUDENTS = [...ADVISEES,
+  { name: "Fe Aquino", no: "25-1-00145", year: 1, gwa: "1.85", curr: "BSCS 2025–present", adviser: "Dr. Leo Santos" },
+  { name: "Gio Bautista", no: "24-1-02230", year: 2, gwa: "2.20", curr: "BSCS 2025–present", adviser: "Dr. Leo Santos" },
+  { name: "Hana Lim", no: "22-1-00950", year: 4, gwa: "1.40", curr: "BSCS 2018–2024", adviser: "Prof. Jun Villa" },
+  { name: "Ivan Torres", no: "23-1-01412", year: 3, gwa: "2.05", curr: "BSCS 2018–2024", adviser: "Prof. Jun Villa" },
+  { name: "Joy Ramos", no: "25-1-00188", year: 1, gwa: "1.95", curr: "BSCS 2025–present", adviser: "Dr. Paz Villanueva" },
+];
+
+const ROLES = {
+  student: { name: "Ana Reyes", sub: "Student · 23-1-01234", groups: ["student"] },
+  adviser: { name: "Prof. Mara Reyes", sub: "Adviser · DCST", groups: ["adviser"] },
+  head: { name: "Dr. Leo Santos", sub: "Department Head · DCST", groups: ["adviser", "head"] },
+  staff: { name: "Rina Cruz", sub: "Department staff · DCST", groups: ["staff"] },
+  dean: { name: "Dr. Paz Villanueva", sub: "Dean · Faculty of Computing", groups: ["adviser", "dean"] },
+  deanhead: { name: "Dr. Paz Villanueva", sub: "Dean and Department Head", groups: ["adviser", "head", "dean"] },
+  admin: { name: "System administrator", sub: "Admin", groups: ["admin"] },
+};
+
+const NAV = {
+  student: { label: "Student", items: [["checklist", "My checklist"], ["myflags", "My grade flags"], ["mynotes", "Advising notes"]] },
+  adviser: { label: "Adviser", items: [["advisees", "My advisees"], ["encode", "Encode grades"], ["import", "Import grades (JSON)"], ["flags", "Grade flags"], ["reports", "Advisee reports"]] },
+  head: { label: "Department Head", items: [["transfers", "Curriculum transfers"], ["curricula", "Curricula"], ["equiv", "Equivalencies"], ["credits", "Outside credits"], ["students", "Students"], ["assign", "Adviser assignments"], ["terms", "Academic terms"], ["reports", "Department reports"], ["audit", "Audit log"], ["settings", "Settings"]] },
+  staff: { label: "Department staff", items: [["students", "Students"], ["assign", "Adviser assignments"], ["terms", "Academic terms"], ["curricula", "Curricula"], ["accounts", "Accounts and roles"]] },
+  dean: { label: "Dean", items: [["reports", "Faculty reports"], ["students", "Students"], ["audit", "Audit log"]] },
+  admin: { label: "Administration", items: [["settings", "Settings"], ["accounts", "Accounts and roles"], ["audit", "Audit log"], ["advisees", "All students"]] },
+};
+
+// ---------- Rules (mirrors docs/02-requirements/01-program-checklist.md) ----------
+const NUM = v => /^\d\.\d\d$/.test(v);
+const effective = a => a.comp || a.fin;
+const isPass = g => NUM(g) ? parseFloat(g) <= 3 : g === "S";
+
+function courseStatus(code) {
+  const atts = ATTEMPTS.filter(a => a.code === code);
+  if (!atts.length) return { key: "nottaken", label: "Not yet taken", atts };
+  const passed = [...atts].reverse().find(a => isPass(effective(a)));
+  if (passed) return { key: "passed", label: "Passed", grade: effective(passed), atts };
+  const last = atts[atts.length - 1], g = effective(last);
+  if (!g) return { key: "ongoing", label: "Ongoing", grade: last.mid ? "mid " + last.mid : "", atts };
+  if (g === "INC") return { key: "inc", label: "INC", grade: g, atts };
+  if (g === "DR") return { key: "dropped", label: "Dropped", grade: g, atts };
+  if (g === "NA") return { key: "failed", label: "Not attending", grade: g, atts };
+  return { key: "failed", label: "Failed", grade: g, atts };
+}
+
+// GWA over a set of curriculum courses (one year-and-semester slot, or the whole curriculum)
+function gwaOf(courses) {
+  const thesisUnits = CURR.filter(c => c.thesis).reduce((s, c) => s + c.units, 0);
+  let sum = 0, units = 0;
+  for (const c of courses) {
+    if (c.cat === "NSTP") continue;
+    const st = courseStatus(c.code);
+    const latest = st.atts.length ? effective(st.atts[st.atts.length - 1]) : "";
+    if (NUM(latest)) { const u = c.thesis ? thesisUnits : c.units; sum += parseFloat(latest) * u; units += u; }
+  }
+  return units ? (sum / units).toFixed(2) : "—";
+}
+
+function summary() {
+  let earned = 0, total = 0, sum = 0, units = 0;
+  const thesisUnits = CURR.filter(c => c.thesis).reduce((s, c) => s + c.units, 0);
+  for (const c of CURR) {
+    total += c.units;
+    const st = courseStatus(c.code);
+    if (st.key === "passed") earned += c.units;
+    if (c.cat === "NSTP") continue;
+    const latest = st.atts.length ? effective(st.atts[st.atts.length - 1]) : "";
+    if (NUM(latest)) { const u = c.thesis ? thesisUnits : c.units; sum += parseFloat(latest) * u; units += u; }
+  }
+  // Year standing: highest N where earned >= units of years 1..N-1
+  let standing = 1;
+  for (let n = 2; n <= 4; n++) {
+    const need = CURR.filter(c => c.year < n).reduce((s, c) => s + c.units, 0);
+    if (earned >= need) standing = n;
+  }
+  const deficiencies = CURR.filter(c => {
+    const k = courseStatus(c.code).key;
+    return (k === "failed" || k === "inc" || k === "dropped") || (k === "nottaken" && c.year < 3);
+  });
+  return { earned, total, gwa: units ? (sum / units).toFixed(2) : "—", standing, deficiencies };
+}
+
+// ---------- Rendering helpers ----------
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const chip = (key, label) => `<span class="chip ${key}">${esc(label)}</span>`;
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.style.display = "block"; clearTimeout(t._h); t._h = setTimeout(() => t.style.display = "none", 2600); }
+function openModal(html) { $("#modal").innerHTML = `<button class="btn secondary small close" onclick="closeModal()">Close</button>` + html; $("#modalBg").classList.add("show"); }
+function closeModal() { $("#modalBg").classList.remove("show"); }
+$("#modalBg").addEventListener("click", e => { if (e.target.id === "modalBg") closeModal(); });
+
+function table(headers, rows, opts = {}) {
+  return `<table class="stack"><thead><tr>${headers.map(h => `<th class="${h.endsWith("#") ? "num" : ""}">${esc(h.replace(/#$/, ""))}</th>`).join("")}</tr></thead><tbody>${
+    rows.map(r => `<tr ${r.onclick ? `class="clickable" onclick="${r.onclick}"` : ""}>${r.cells.map((c, i) => `<td data-l="${esc(headers[i].replace(/#$/, ""))}" class="${headers[i].endsWith("#") ? "num" : ""}">${c}</td>`).join("")}</tr>`).join("")
+  }</tbody></table>`;
+}
+
+// ---------- Screens ----------
+const S = {};
+
+S.checklist = (ctx) => {
+  const sm = summary();
+  const viewer = ctx.viewer || "student";
+  const groups = [];
+  for (const c of CURR) {
+    const k = c.year + "-" + c.term;
+    let g = groups.find(x => x.k === k);
+    if (!g) groups.push(g = { k, year: c.year, term: c.term, courses: [] });
+    g.courses.push(c);
+  }
+  const sem = g => {
+    const units = g.courses.reduce((s, c) => s + c.units, 0);
+    const done = g.courses.filter(c => courseStatus(c.code).key === "passed").length;
+    const open = g.courses.some(c => ["ongoing", "failed", "inc", "dropped"].includes(courseStatus(c.code).key)) || g.year === 3;
+    return `<details class="sem" ${open ? "open" : ""}><summary><span class="t">${YEAR_LABEL[g.year]} · ${TERM_LABEL[g.term]}</span><span class="sub">${done}/${g.courses.length} passed · ${units} units · GWA ${gwaOf(g.courses)}</span></summary><div class="body">${
+      table(["Course", "Title", "Units#", "Grade#", "Status"], g.courses.map(c => {
+        const st = courseStatus(c.code);
+        const taken = st.atts.find(a => a.takenAs);
+        return { onclick: `courseDetail('${c.code}','${viewer}')`, cells: [
+          `<span class="code">${esc(c.code)}</span>`,
+          esc(c.title) + (taken ? `<div class="hint">Taken as ${esc(taken.takenAs)}</div>` : "") + (st.atts.length > 1 ? `<div class="hint">${st.atts.length} attempts</div>` : ""),
+          c.units, esc(st.grade || ""), chip(st.key, st.label)] };
+      }))
+    }</div></details>`;
+  };
+  const head = ctx.embedded
+    ? `<div class="row-actions" style="justify-content:flex-end;margin-bottom:12px"><span class="sub" style="margin-right:auto">Adviser: Prof. Mara Reyes · Last updated 14 Oct 2026</span><button class="btn secondary" onclick="openPdf('checklist')">Download PDF</button></div>`
+    : `
+    <div class="page-head"><div>
+      <h1>${viewer === "student" ? "My checklist" : "Ana Reyes"}</h1>
+      <div class="sub">BSCS · ${CURRICULUM_NAME} · Adviser: Prof. Mara Reyes · Last updated 14 Oct 2026 by Prof. Mara Reyes</div>
+    </div><div class="row-actions"><button class="btn secondary" onclick="openPdf('checklist')">Download PDF</button></div></div>`;
+  return `${head}
+    <div class="stats">
+      <div class="stat"><div class="label">Units earned</div><div class="value">${sm.earned} / ${sm.total}</div><div class="hint">${sm.total - sm.earned} remaining</div></div>
+      <div class="stat"><div class="label">GWA (overall)</div><div class="value">${sm.gwa}</div><div class="hint">NSTP excluded</div></div>
+      <div class="stat"><div class="label">Year standing</div><div class="value">${YEAR_LABEL[sm.standing]}</div><div class="hint">from units earned</div></div>
+      <div class="stat warn"><div class="label">Deficiencies</div><div class="value">${sm.deficiencies.length}</div><div class="hint">${sm.deficiencies.map(c => c.code).join(", ") || "none"}</div></div>
+    </div>
+    <div class="hint" style="margin-bottom:10px">Tap a course to see every attempt${viewer === "student" ? " or flag a grade" : ""}.</div>
+    ${groups.map(sem).join("")}`;
+};
+
+window.courseDetail = (code, viewer) => {
+  const c = CURR.find(x => x.code === code), st = courseStatus(code);
+  const attempts = st.atts.length ? table(["Term", "Midterm", "Final", "Completion", "Instructor"], st.atts.map(a => ({ cells: [
+    `${esc(a.sy)} ${TERM_LABEL[a.term]}`, esc(a.mid), esc(a.fin || "—"), esc(a.comp || "—"), esc(a.instr) + (a.takenAs ? `<div class="hint">${esc(a.takenAs)}</div>` : "")] }))) : `<p class="sub">Not yet taken.</p>`;
+  const flagForm = viewer === "student" && st.atts.length ? `
+    <h3 style="margin-top:16px">Flag a grade</h3>
+    <p class="hint">If a grade here doesn't match your official record, tell your adviser.</p>
+    <textarea class="input" rows="3" placeholder="e.g. My final grade in the VSU system is 1.75, not 2.00."></textarea>
+    <div style="margin-top:8px"><button class="btn" onclick="closeModal();toast('Flag sent to Prof. Mara Reyes')">Send flag</button></div>` : "";
+  const history = viewer !== "student" && st.atts.length ? `<h3 style="margin-top:16px">Change history</h3><p class="hint">14 Oct 2026 · Prof. Mara Reyes · final grade entered<br>02 Oct 2026 · Prof. Mara Reyes · midterm grade entered</p>` : "";
+  openModal(`<h2>${esc(c.code)} · ${esc(c.title)}</h2><p class="sub">${c.units} units · ${esc(c.cat)} · ${YEAR_LABEL[c.year]}, ${TERM_LABEL[c.term]}</p>
+    <p>Status: ${chip(st.key, st.label)}</p>${attempts}${history}${flagForm}`);
+};
+
+S.myflags = () => `
+  <div class="page-head"><div><h1>My grade flags</h1><div class="sub">Grades you reported as wrong</div></div></div>
+  <div class="card">${table(["Course", "Your comment", "Status", "Adviser's response"], [
+    { cells: ["<span class='code'>CSci 33</span>", "My midterm grade is 2.00 in the VSU system.", chip("open", "Open"), "—"] },
+    { cells: ["<span class='code'>CSci 25</span>", "Final grade should be 2.25.", chip("passed", "Fixed"), "Corrected, thanks. — Prof. Mara Reyes"] },
+    { cells: ["<span class='code'>GE 3</span>", "I think my final grade is 1.75.", chip("dropped", "Rejected"), "Checked the class record: 2.00 is correct. — Prof. Mara Reyes"] },
+  ])}</div>`;
+
+const NOTES = [
+  { d: "14 Oct 2026", by: "Prof. Mara Reyes", t: "Discussed GE 5 (dropped). Plan to retake it next semester. Keep CSci 33 above 2.50.", archived: false },
+  { d: "20 Jun 2026", by: "Prof. Mara Reyes", t: "Midyear: CSci 14 retake passed. On track for 3rd year standing.", archived: false },
+  { d: "12 Feb 2025", by: "Prof. Jun Villa", t: "GE 4 is INC: submit the missing requirements to Prof. Lim before March.", archived: true },
+  { d: "10 Jan 2025", by: "Prof. Jun Villa", t: "First advising. Recommended joining a study group for Discrete Structures.", archived: true },
+];
+let notesTab = "active";
+window.setNotesTab = t => { notesTab = t; render(); };
+window.toggleNote = i => { NOTES[i].archived = !NOTES[i].archived; toast(NOTES[i].archived ? "Note archived" : "Note restored to active"); render(); };
+S.mynotes = (ctx) => {
+  const adv = ctx.viewer === "adviser" && ctx.role !== "dean";
+  const shown = NOTES.map((n, i) => ({ ...n, i })).filter(n => n.archived === (notesTab === "archived"));
+  const count = a => NOTES.filter(n => n.archived === a).length;
+  return `
+  ${ctx.embedded ? "" : `<div class="page-head"><div><h1>Advising notes</h1><div class="sub">${adv ? "Visible to the student. Archive a note once it's resolved or belongs to a past semester." : "From your advisers"}</div></div></div>`}
+  ${adv && notesTab === "active" ? `<div class="card"><label class="f">New note</label><textarea class="input" rows="3"></textarea><div style="margin-top:8px"><button class="btn" onclick="toast('Note saved; Ana Reyes notified')">Save note</button></div></div>` : ""}
+  <div class="tabs"><a href="javascript:void 0" onclick="setNotesTab('active')" class="${notesTab === "active" ? "active" : ""}">Active (${count(false)})</a><a href="javascript:void 0" onclick="setNotesTab('archived')" class="${notesTab === "archived" ? "active" : ""}">Archived (${count(true)})</a></div>
+  ${shown.map(n => `<div class="card"><div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start"><div class="sub">${n.d} · ${n.by}</div>${adv ? `<button class="btn secondary small" onclick="toggleNote(${n.i})">${n.archived ? "Restore" : "Archive"}</button>` : ""}</div><div>${esc(n.t)}</div></div>`).join("") || `<p class="sub">No ${notesTab} notes.</p>`}`;
+};
+
+S.advisees = (ctx) => `
+  <div class="page-head"><div><h1>${ctx.role === "admin" ? "All students" : "My advisees"}</h1><div class="sub">${ctx.role === "admin" ? "Every view of a record is logged" : "5 current advisees · DCST"}</div></div>
+  <input class="input" style="max-width:260px" placeholder="Search name or student number"></div>
+  <div class="card">${table(["Student", "Student no.", "Curriculum", "Year", "GWA#", "Open flags#", "Deficiencies#"], ADVISEES.map(a => ({
+    onclick: "go('record')", cells: [`<a href="#/record">${esc(a.name)}</a>`, a.no, a.curr, YEAR_LABEL[a.year], a.gwa, a.flags ? chip("open", a.flags) : "0", a.def] })))}</div>`;
+
+S.record = (ctx) => {
+  const tab = ctx.tab || "checklist";
+  const tabs = [["checklist", "Checklist"], ["terms", "Grades by term"], ["notes", "Notes"], ["curriculum", "Curriculum"]].filter(([k]) => ctx.role !== "dean" || k === "checklist" || k === "terms");
+  let body = "";
+  if (tab === "checklist") body = S.checklist({ viewer: "adviser", embedded: true });
+  if (tab === "terms") {
+    const terms = [...new Set(ATTEMPTS.map(a => a.sy + "|" + a.term))];
+    body = (ctx.role === "dean" ? "" : `<div class="row-actions" style="margin-bottom:12px"><a class="btn" href="#/encode">Encode grades</a></div>`) + terms.map(t => {
+      const [sy, term] = t.split("|");
+      return `<div class="card"><h2>${sy} · ${TERM_LABEL[term]}</h2>${table(["Course", "Midterm", "Final", "Completion", "Instructor", "Remarks"], ATTEMPTS.filter(a => a.sy === sy && a.term === term).map(a => ({ cells: [`<span class="code">${esc(a.code)}</span>`, a.mid, a.fin || "—", a.comp || "—", esc(a.instr), a.code === "GE 4" ? "Completed requirements 3 Mar 2025" : ""] })))}</div>`;
+    }).join("");
+  }
+  if (tab === "notes") body = S.mynotes({ viewer: "adviser", role: ctx.role, embedded: true });
+  if (tab === "curriculum") body = `
+    <div class="card"><h2>Curriculum history</h2>${table(["Curriculum version", "From", "To", "Note"], [
+      { cells: ["BSCS 2018–2024", "1st Sem 2023–2024", "Midyear 2025", "Initial assignment"] },
+      { cells: ["BSCS 2025–present", "1st Sem 2025–2026", "—", "Transfer approved by Dr. Leo Santos, 30 Jul 2025"] }])}</div>
+    <div class="card"><h2>Endorse a curriculum transfer</h2>
+      <div class="form-grid"><div><label class="f">Transfer to</label><select class="input"><option>BSCS 2018–2024</option></select></div></div>
+      <label class="f">Reason</label><textarea class="input" rows="2"></textarea>
+      <div style="margin-top:8px"><button class="btn" onclick="toast('Endorsed. Sent to the Department Head for approval.')">Endorse transfer</button></div>
+      <p class="hint">Courses with the same code and title carry over automatically. Other courses carry over through the Department Head's equivalencies; the rest are listed as not credited.</p></div>`;
+  return `<div class="page-head"><div><h1>Ana Reyes</h1><div class="sub">23-1-01234 · BSCS · ${CURRICULUM_NAME} · ${YEAR_LABEL[summary().standing]} standing</div></div></div>
+    ${ctx.role === "dean" ? `<div class="notice info">Read-only Dean view. Opening this record is recorded in the audit log.</div>` : ""}<div class="tabs">${tabs.map(([k, l]) => `<a href="#/record/${k}" class="${k === tab ? "active" : ""}">${l}</a>`).join("")}</div>${body}`;
+};
+
+const GRADE_MID = ["", ...Array.from({ length: 17 }, (_, i) => (1 + i * 0.25).toFixed(2)), "INC", "NA", "DR"];
+const GRADE_FIN = ["", ...Array.from({ length: 9 }, (_, i) => (1 + i * 0.25).toFixed(2)), "5.00", "INC", "NA", "DR"];
+S.encode = () => {
+  const rows = ATTEMPTS.filter(a => a.sy === "2026–2027");
+  const sel = (opts, v, cls) => `<select class="input ${cls}" onchange="checkRow(this)">${opts.map(o => `<option ${o === v ? "selected" : ""}>${o}</option>`).join("")}</select>`;
+  return `<div class="page-head"><div><h1>Encode grades</h1><div class="sub">One advisee, one term, all courses</div></div><a class="btn secondary" href="#/import">Import a JSON file instead</a></div>
+  <div class="card"><div class="form-grid">
+    <div><label class="f">Advisee</label><select class="input"><option>Ana Reyes · 23-1-01234</option><option>Ben Lopez · 23-1-01301</option></select></div>
+    <div><label class="f">Term</label><select class="input"><option>2026–2027 · 1st Semester</option><option>2025–2026 · 2nd Semester</option></select></div>
+  </div></div>
+  <div class="card">
+    <table class="stack"><thead><tr><th>Course</th><th>Instructor</th><th>Midterm</th><th>Final</th><th>Remarks</th></tr></thead><tbody>
+    ${rows.map(a => `<tr><td data-l="Course"><span class="code">${esc(a.code)}</span>${a.takenAs ? `<div class="hint">${esc(a.takenAs)}</div>` : ""}</td>
+      <td data-l="Instructor"><input class="input" value="${esc(a.instr)}"></td>
+      <td data-l="Midterm">${sel(GRADE_MID, a.mid, "mid")}</td>
+      <td data-l="Final">${sel(GRADE_FIN, a.fin, "fin")}<div class="err"></div></td>
+      <td data-l="Remarks"><input class="input"></td></tr>`).join("")}
+    <tr><td colspan="5"><button class="btn secondary small" onclick="toast('Pick a course from the curriculum or an elective option')">+ Add course</button></td></tr>
+    </tbody></table>
+    <p class="hint">Try setting a final grade to DR without a DR midterm, or a midterm to DR: SAAIS enforces the VSU grade rules as you type.</p>
+    <div class="row-actions"><button class="btn" onclick="toast('Saved. Changes recorded in the grade history.')">Save grades</button></div>
+  </div>`;
+};
+window.checkRow = (el) => {
+  const tr = el.closest("tr"), mid = tr.querySelector(".mid"), fin = tr.querySelector(".fin"), err = tr.querySelector(".err");
+  let msg = "";
+  if (mid.value === "DR" && fin.value !== "DR") { fin.value = "DR"; msg = "Midterm is DR, so the final is DR too."; }
+  else if (fin.value === "DR" && mid.value !== "DR") msg = "A DR final needs a DR midterm.";
+  fin.classList.toggle("invalid", msg.startsWith("A DR"));
+  err.textContent = msg;
+};
+
+S.import = () => `
+  <div class="page-head"><div><h1>Import grades (JSON)</h1><div class="sub">For many advisees or terms at once</div></div>
+  <button class="btn secondary" onclick="toast('Template downloaded (prototype)')">Download template</button></div>
+  <div class="card"><div class="drop">Drop a .json file here, or <a href="javascript:void 0" onclick="showImport()">choose a file</a></div></div>
+  <div id="importResult"></div>`;
+window.showImport = () => {
+  $("#importResult").innerHTML = `<div class="card"><h2>grades-2026-1st-sem.json</h2>
+    <div class="notice ok">22 rows are valid and ready to save.</div>
+    <div class="notice warn">2 rows were rejected. Nothing is saved until you confirm.</div>
+    ${table(["Row#", "Student", "Course", "Problem"], [
+      { cells: [7, "23-1-01301", "CSci 31", "Final grade DR without a DR midterm"] },
+      { cells: [15, "24-1-02011", "CSci 99", "Course not in the student's curriculum or elective options"] }])}
+    <div class="row-actions" style="margin-top:12px"><button class="btn" onclick="toast('22 grades saved. Import recorded.')">Save the 22 valid rows</button><button class="btn secondary" onclick="$('#importResult').innerHTML=''">Cancel</button></div></div>`;
+};
+
+S.flags = () => `
+  <div class="page-head"><div><h1>Grade flags</h1><div class="sub">Grades your advisees reported as wrong</div></div></div>
+  <div class="card">${table(["Student", "Course", "Grade", "Comment", "Raised", ""], [
+    { cells: ["Ana Reyes", "<span class='code'>CSci 33</span>", "mid 2.25", "My midterm grade is 2.00 in the VSU system.", "15 Oct 2026",
+      `<div class="row-actions"><button class="btn small" onclick="go('encode')">Fix grade</button><button class="btn danger small" onclick="rejectFlag()">Reject</button></div>`] }])}</div>`;
+window.rejectFlag = () => openModal(`<h2>Reject flag</h2><p class="sub">Ana Reyes · CSci 33</p><label class="f">Reason (the student sees this)</label><textarea class="input" rows="3"></textarea><div style="margin-top:8px"><button class="btn" onclick="closeModal();toast('Flag rejected; student notified')">Reject flag</button></div>`);
+
+S.transfers = () => `
+  <div class="page-head"><div><h1>Curriculum transfers</h1><div class="sub">Endorsed by advisers, waiting for your decision</div></div></div>
+  <div class="card">${table(["Student", "From", "To", "Endorsed by", "Reason", ""], [
+    { cells: ["Ben Lopez · 23-1-01301", "BSCS 2018–2024", "BSCS 2025–present", "Prof. Mara Reyes, 12 Oct 2026", "Returning after a leave of absence",
+      `<div class="row-actions"><button class="btn small" onclick="previewTransfer()">Review</button></div>`] }])}</div>`;
+window.previewTransfer = () => openModal(`<h2>Transfer: Ben Lopez</h2><p class="sub">BSCS 2018–2024 → BSCS 2025–present</p>
+  ${table(["Old course", "In the new version", ""], [
+    { cells: ["CSci 21 Data Structures and Algorithms", "CSci 21 (same course)", chip("passed", "Credited")] },
+    { cells: ["CSci 105 Web Development", "CSci 51 Web Systems and Technologies", chip("passed", "Equivalency")] },
+    { cells: ["CSci 108 Multimedia Systems", "—", chip("notcredited", "Not credited")] }])}
+  <label class="f" style="margin-top:12px">Decision note</label><textarea class="input" rows="2"></textarea>
+  <div class="row-actions" style="margin-top:8px"><button class="btn" onclick="closeModal();toast('Transfer approved; history updated')">Approve</button><button class="btn danger" onclick="closeModal();toast('Transfer rejected')">Reject</button></div>`);
+
+S.curricula = (ctx) => `
+  <div class="page-head"><div><h1>Curricula</h1><div class="sub">BSCS · DCST</div></div>${ctx.role === "head" ? `<button class="btn secondary" onclick="toast('New version (prototype)')">+ New version</button>` : ""}</div>
+  <div class="card">${table(["Version name", "Students#", "Status", ""], [
+    { cells: ["BSCS 2025–present", 212, chip("passed", "Current"), ctx.role === "head" ? `<button class="btn secondary small" onclick="renameCurr('BSCS 2025–present')">Rename</button>` : ""] },
+    { cells: ["BSCS 2018–2024", 147, chip("dropped", "Older"), ctx.role === "head" ? `<button class="btn secondary small" onclick="renameCurr('BSCS 2018–2024')">Rename</button>` : ""] }])}</div>
+  <div class="card"><h2>BSCS 2025–present · 3rd Year · 1st Semester</h2>${table(["Course", "Units#", "Category", "Prerequisites"], [
+    { cells: ["<span class='code'>CSci 31</span> Operating Systems", 3, "Professional", "CSci 25"] },
+    { cells: ["<span class='code'>CSci 32</span> Software Engineering 1", 3, "Professional", "CSci 24"] },
+    { cells: ["<span class='code'>CSci 33</span> Automata Theory", 3, "Professional", "CSci 23"] },
+    { cells: ["<span class='code'>CS Elective 1</span> Elective slot", 3, "Elective", "Options: CSci 51, CSci 52, CSci 53"] }])}
+    <p class="hint">Prerequisite kinds: course, co-requisite, year standing, and category range (e.g. all Common and Professional courses from 1st to 3rd year).</p></div>`;
+window.renameCurr = n => openModal(`<h2>Rename curriculum version</h2><label class="f">Name</label><input class="input" value="${esc(n)}"><div style="margin-top:8px"><button class="btn" onclick="closeModal();toast('Renamed')">Save</button></div>`);
+
+S.equiv = () => `
+  <div class="page-head"><div><h1>Equivalencies</h1><div class="sub">One-to-one, BSCS 2018–2024 → BSCS 2025–present. Same code and title needs no equivalency.</div></div><button class="btn" onclick="toast('Add equivalency (prototype)')">+ Add</button></div>
+  <div class="card">${table(["Old course", "New course", "Set by"], [
+    { cells: ["CSci 105 Web Development", "CSci 51 Web Systems and Technologies", "Dr. Leo Santos"] },
+    { cells: ["CSci 110 Data Communications", "CSci 34 Computer Networks", "Dr. Leo Santos"] }])}</div>`;
+
+S.credits = () => `
+  <div class="page-head"><div><h1>Outside credits</h1><div class="sub">Shiftees and transferees</div></div><button class="btn" onclick="toast('Add credit (prototype)')">+ Credit a course</button></div>
+  <div class="card">${table(["Student", "Outside course", "School", "Grade", "Credited as"], [
+    { cells: ["Dino Castillo · 24-1-02011", "IT 101 Intro to Computing (3 units)", "VSU · BSIT", "1.75", "CSci 11 Introduction to Computing"] }])}</div>`;
+
+S.students = (ctx) => {
+  const dean = ctx.role === "dean", staff = ctx.role === "staff";
+  const advisers = [...new Set(ALL_STUDENTS.map(a => a.adviser))];
+  const email = a => a.name.split(" ")[0].toLowerCase() + "." + a.name.split(" ")[1].toLowerCase() + "@vsu.edu.ph";
+  const headers = dean ? ["Name", "Student no.", "Department", "Curriculum", "Adviser"] : ["Name", "Student no.", "VSU email", "Curriculum", "Adviser"];
+  return `
+  <div class="page-head"><div><h1>Students</h1><div class="sub">${dean ? "Faculty of Computing · opening a record is logged" : "DCST · BSCS" + (staff ? " · profile data only" : "")}</div></div>${dean ? "" : `<button class="btn" onclick="openImportStudents()">Import from spreadsheet</button>`}</div>
+  <div class="card">
+    <div class="form-grid">
+      <div><label class="f">Name or student no.</label><input class="input" id="fText" oninput="filterStudents()" placeholder="e.g. reyes or 23-1"></div>
+      <div><label class="f">Curriculum</label><select class="input" id="fCurr" onchange="filterStudents()"><option value="">All curricula</option><option>BSCS 2025–present</option><option>BSCS 2018–2024</option></select></div>
+      <div><label class="f">Adviser</label><select class="input" id="fAdv" onchange="filterStudents()"><option value="">All advisers</option>${advisers.map(a => `<option>${esc(a)}</option>`).join("")}</select></div>
+    </div>
+    <div class="hint" id="fCount">${ALL_STUDENTS.length} students</div>
+    <div id="studentTable">${table(headers, ALL_STUDENTS.map(a => ({ onclick: staff ? "" : "go('record')", cells: [esc(a.name), a.no, dean ? "DCST" : email(a), a.curr, esc(a.adviser)] })))}</div>
+  </div>`;
+};
+window.filterStudents = () => {
+  const t = $("#fText").value.trim().toLowerCase(), c = $("#fCurr").value, a = $("#fAdv").value;
+  let n = 0;
+  document.querySelectorAll("#studentTable tbody tr").forEach((tr, i) => {
+    const s = ALL_STUDENTS[i];
+    const ok = (!t || s.name.toLowerCase().includes(t) || s.no.includes(t)) && (!c || s.curr === c) && (!a || s.adviser === a);
+    tr.style.display = ok ? "" : "none";
+    if (ok) n++;
+  });
+  $("#fCount").textContent = n + " of " + ALL_STUDENTS.length + " students";
+};
+window.openImportStudents = () => openModal(`<h2>Import students</h2><p class="hint">Columns: student no. (YY-N-NNNNN), name, VSU email, curriculum version, adviser email.</p><div class="drop">Drop a .xlsx or .csv file</div><div class="notice ok" style="margin-top:12px">Sample: 48 rows valid, 1 rejected (student no. "2023-01234" is not in YY-N-NNNNN format).</div><button class="btn" onclick="closeModal();toast('48 students imported')">Import 48 students</button>`);
+
+S.assign = () => `
+  <div class="page-head"><div><h1>Adviser assignments</h1><div class="sub">One adviser per student; history kept</div></div><button class="btn" onclick="toast('Bulk reassign (prototype)')">Reassign selected</button></div>
+  <div class="card">${table(["", "Student", "Current adviser", "Since", "Previous"], ADVISEES.map((a, i) => ({ cells: [`<input type="checkbox">`, esc(a.name), "Prof. Mara Reyes", i < 2 ? "Jun 2025" : "Aug 2024", i < 2 ? "Prof. Jun Villa" : "—"] })))}</div>`;
+
+S.terms = () => `
+  <div class="page-head"><div><h1>Academic terms</h1></div><button class="btn secondary" onclick="toast('Add term (prototype)')">+ Add term</button></div>
+  <div class="card">${table(["Term", "Dates", "Grade encoding", ""], [
+    { cells: ["2026–2027 · 1st Semester", "Aug–Dec 2026", chip("ongoing", "Open"), `<button class="btn small" onclick="toast('Encoding closed. Backup reminder sent to the admin.')">Close encoding</button>`] },
+    { cells: ["2025–2026 · Midyear", "Jun–Jul 2026", chip("passed", "Closed 10 Aug 2026"), ""] },
+    { cells: ["2025–2026 · 2nd Semester", "Jan–May 2026", chip("passed", "Closed 15 Jun 2026"), ""] }])}</div>`;
+
+S.reports = (ctx) => {
+  const scope = ctx.role === "dean" ? "Faculty of Computing" : ctx.role === "head" ? "DCST" : "My advisees";
+  const dist = [["1.00–1.50", 34], ["1.75–2.25", 41], ["2.50–3.00", 18], ["5.00", 4], ["INC / DR / NA", 3]];
+  return `<div class="page-head"><div><h1>Reports</h1><div class="sub">${scope} · read-only</div></div>
+    <div class="row-actions">${ctx.role === "dean" ? `<select class="input" style="width:auto"><option>All departments</option><option>DCST</option><option>DIT Alang-alang</option><option>DIT Isabel</option></select>` : ""}<button class="btn secondary" onclick="openPdf('report')">Download PDF</button></div></div>
+    <div class="stats"><div class="stat"><div class="label">Students</div><div class="value">${ctx.role === "dean" ? 359 : ctx.role === "head" ? 359 : 5}</div></div>
+    <div class="stat"><div class="label">Mean GWA</div><div class="value">1.98</div></div>
+    <div class="stat warn"><div class="label">With deficiencies</div><div class="value">${ctx.role === "adviser" ? 4 : 61}</div></div></div>
+    <div class="card"><h2>Final grade distribution · 2025–2026 2nd Semester</h2>
+    ${dist.map(([l, p]) => `<div style="display:flex;gap:10px;align-items:center;margin:6px 0"><span style="width:110px" class="sub">${l}</span><div style="flex:1"><div class="bar ${l.startsWith("5") || l.startsWith("INC") ? "gold" : ""}" style="width:${p * 2}%"></div></div><span style="width:40px" class="num">${p}%</span></div>`).join("")}</div>
+    <div class="card"><h2>GWA by batch and curriculum version</h2>${table(["Batch", "Curriculum", "Students#", "Mean GWA#", ""], [
+      { cells: ["2022", "BSCS 2018–2024", 88, "1.95", `<button class="btn secondary small" onclick="drill()">View students</button>`] },
+      { cells: ["2023", "BSCS 2025–present", 96, "2.02", `<button class="btn secondary small" onclick="drill()">View students</button>`] },
+      { cells: ["2024", "BSCS 2025–present", 101, "2.06", `<button class="btn secondary small" onclick="drill()">View students</button>`] }])}</div>
+    <p class="hint">Advising activity, standing, and milestone reports are added in releases 2 and 3.</p>`;
+};
+window.drill = () => openModal(`<h2>Students behind this number</h2><div class="notice info">Opening this list is recorded in the audit log.</div>${table(["Student", "GWA#"], ADVISEES.slice(0, 3).map(a => ({ cells: [esc(a.name), a.gwa] })))}`);
+
+S.audit = (ctx) => `
+  <div class="page-head"><div><h1>Audit log</h1><div class="sub">${ctx.role === "dean" ? "Faculty of Computing" : ctx.role === "head" ? "DCST students" : "All entries"} · read-only, cannot be edited</div></div></div>
+  <div class="card"><div class="form-grid"><div><label class="f">Person</label><input class="input"></div><div><label class="f">Student</label><input class="input"></div><div><label class="f">Action</label><select class="input"><option>All</option><option>View</option><option>Change</option><option>Sign-in</option></select></div><div><label class="f">From</label><input class="input" type="date"></div></div>
+  ${table(["When", "Who", "Action", "Student", "Details"], [
+    { cells: ["16 Oct 2026 09:14", "Prof. Mara Reyes", chip("ongoing", "View"), "Ana Reyes", "Opened checklist"] },
+    { cells: ["14 Oct 2026 16:02", "Prof. Mara Reyes", chip("inc", "Change"), "Ana Reyes", "CSci 25 final: 2.25 → 2.50"] },
+    { cells: ["14 Oct 2026 15:40", "Dr. Paz Villanueva", chip("ongoing", "View"), "—", "Report drill-down: batch 2023 (96 students)"] },
+    { cells: ["13 Oct 2026 08:01", "System administrator", chip("ongoing", "View"), "Ben Lopez", "Opened grades by term"] }])}</div>`;
+
+S.settings = (ctx) => `
+  <div class="page-head"><div><h1>Settings</h1></div></div>
+  ${ctx.role === "admin" ? `<div class="notice warn">Last backup: 30 Jun 2026. The 2025–2026 Midyear encoding closed on 10 Aug 2026 with no backup since. Download a backup now.</div>` : ""}
+  <div class="card"><h2>Scholastic standing thresholds</h2><p class="hint">Percentage of the term's units failed. Defaults until VSU's official values are confirmed.</p>
+    <div class="form-grid"><div><label class="f">Warning from (%)</label><input class="input" value="25"></div><div><label class="f">Probation from (%)</label><input class="input" value="50"></div><div><label class="f">Dismissal from (%)</label><input class="input" value="75"></div></div>
+    <button class="btn" onclick="toast('Saved')">Save</button></div>
+  ${ctx.role === "admin" ? `<div class="card"><h2>Email</h2><div class="form-grid"><div><label class="f">Sender address</label><input class="input" value="dcst@vsu.edu.ph"></div></div><button class="btn" onclick="toast('Saved')">Save</button></div>
+  <div class="card"><h2>Backups</h2><p>Run <code>supabase db dump</code> on your PC, keep the file encrypted, then record it here.</p><button class="btn" onclick="toast('Backup recorded for 16 Oct 2026')">Record a backup made today</button></div>` : ""}`;
+
+S.accounts = (ctx) => `
+  <div class="page-head"><div><h1>Accounts and roles</h1><div class="sub">${ctx.role === "admin" ? "All departments" : "DCST"}</div></div><button class="btn" onclick="toast('Add person (prototype)')">+ Add person</button></div>
+  <div class="card">${table(["Name", "VSU email", "Roles"], [
+    { cells: ["Dr. Leo Santos", "leo.santos@vsu.edu.ph", chip("gold", "Department Head") + " " + chip("passed", "Adviser")] },
+    { cells: ["Prof. Mara Reyes", "mara.reyes@vsu.edu.ph", chip("passed", "Adviser")] },
+    { cells: ["Rina Cruz", "rina.cruz@vsu.edu.ph", chip("ongoing", "Department staff")] },
+    { cells: ["Dr. Paz Villanueva", "paz.villanueva@vsu.edu.ph", chip("dropped", "Dean")] }])}</div>`;
+
+S.notifications = () => `
+  <div class="page-head"><div><h1>Notifications</h1></div></div>
+  ${[["Grade flag", "Ana Reyes flagged CSci 33 (midterm).", "15 Oct 2026"], ["Transfer", "Your endorsement for Ben Lopez is waiting for the Department Head.", "12 Oct 2026"], ["Note", "New advising note from Prof. Mara Reyes.", "14 Oct 2026"]].map(([t, m, d]) => `<div class="card"><div class="sub">${t} · ${d}</div>${esc(m)}</div>`).join("")}`;
+
+// ---------- Shell and routing ----------
+let role = "student";
+// [menu section, screen] each role starts on
+const DEFAULT = { student: ["student", "checklist"], adviser: ["adviser", "advisees"], head: ["head", "transfers"], staff: ["staff", "students"], dean: ["dean", "reports"], deanhead: ["dean", "reports"], admin: ["admin", "settings"] };
+// The menu section the user is working in decides the scope and the PDF header's office line
+let acting = "student";
+
+// ---------- PDF template preview ----------
+const VISION = "A global green university providing progressive leadership in agriculture, science & technology, education and allied fields for societal transformation.";
+const MISSION = "To produce graduates equipped with advanced knowledge and lifelong learning skills with ethical standards through high quality instruction, innovative research, and impactful community engagements.";
+// Letterhead details are stored per department and Faculty, as on the office's own documents (DCST minutes, FC memos)
+const DCST = { prefix: "Department of", name: ["COMPUTER SCIENCE", "& TECHNOLOGY"], logo: true,
+  contact: ["<b>DEPARTMENT OF<br>COMPUTER SCIENCE AND TECHNOLOGY</b>", "ICT Building, Visayas State University", "Visca, Baybay City, Leyte, PHILIPPINES", "<i>Telefax:</i> 053 565 0600 local 1022", "<i>Email:</i> dcst@vsu.edu.ph", "<i>Website:</i> www.vsu.edu.ph"] };
+const FC = { prefix: "FACULTY OF", name: ["COMPUTING"], logo: false,
+  contact: ["<b>FACULTY OF COMPUTING</b>", "Visayas State University, Baybay City, Leyte", "Email: faculty.computing@vsu.edu.ph", "Website: www.vsu.edu.ph", "Phone: +63 53 565 0600 Local 1022"] };
+// Student and admin downloads carry VSU only: no office in the header, no contact block in the footer
+const OFFICE = { student: null, admin: null, adviser: DCST, head: DCST, staff: DCST, dean: FC };
+const WATERMARK = `<svg class="wm" viewBox="0 0 200 200" fill="none" stroke="#F1F3F1" stroke-width="1.6"><circle cx="100" cy="100" r="98"/><circle cx="100" cy="100" r="82"/><rect x="43" y="43" width="114" height="114" rx="18"/><rect x="62" y="62" width="76" height="76"/><circle cx="100" cy="100" r="24"/><circle cx="100" cy="100" r="7"/></svg>`;
+// pages: one body per page. The letterhead and contact footer go on page 1; later pages carry the vision and mission.
+function sheet(title, pages) {
+  const office = OFFICE[acting], n = pages.length;
+  const pageNo = i => `<div class="ctl">Page ${i + 1} of ${n}</div>`;
+  const letterhead = `<div class="lh"><div class="img" style="width:50px;height:50px">Bagong Pilipinas logo</div><div class="img" style="width:168px;height:52px">VSU Brand Logo + Text Logo</div>${office ? `<div class="bar"></div><div class="off"><div class="op">${office.prefix}</div>${office.name.map(l => `<div class="on">${l}</div>`).join("")}</div>` : ""}</div>`;
+  const foot1 = i => `<div class="pf f1">${office ? `${office.logo ? `<div class="img round" style="width:44px;height:44px">Office logo</div>` : ""}<div class="contact">${office.contact.join("<br>")}</div>` : `<div class="contact"></div>`}
+      <div class="img" style="width:96px;height:46px">ISO 9001:2015 (TÜV Rheinland) badge</div><div class="img" style="width:68px;height:40px">QS Stars badge</div>${pageNo(i)}</div>`;
+  const foot2 = i => `<div class="pf f2"><div class="vm"><b>Vision:</b><span>${VISION}</span><b>Mission:</b><span>${MISSION}</span></div>${pageNo(i)}</div>`;
+  return pages.map((body, i) => `<div class="sheet-wrap"><div class="sheet">${WATERMARK}
+    ${i === 0 ? letterhead + `<div class="dt">${title}</div>` : ""}
+    <div class="body">${body}${i === n - 1 ? `<div class="meta">Not an official record. Official grades are kept in the VSU student records system. · Generated 16 Oct 2026, 10:42 by ${esc(ROLES[role].name)} through SAAIS</div>` : ""}</div>
+    ${i === 0 ? foot1(i) : foot2(i)}</div></div>`).join("");
+}
+function checklistPdf() {
+  const sm = summary(), groups = [];
+  for (const c of CURR) { const k = c.year + "-" + c.term; let g = groups.find(x => x.k === k); if (!g) groups.push(g = { k, year: c.year, term: c.term, courses: [] }); g.courses.push(c); }
+  const slot = g => {
+    const units = g.courses.reduce((s, c) => s + c.units, 0), done = g.courses.filter(c => courseStatus(c.code).key === "passed").length;
+    return `<div><div class="slot-h"><span>${YEAR_LABEL[g.year]} · ${TERM_LABEL[g.term]}</span><span>${done}/${g.courses.length} passed · ${units} u · GWA ${gwaOf(g.courses)}</span></div>
+      <table><thead><tr><th>Course</th><th>Descriptive title</th><th class="n">Units</th><th class="n">Grade</th><th>Remarks</th></tr></thead><tbody>${g.courses.map(c => {
+        const st = courseStatus(c.code), taken = st.atts.find(a => a.takenAs);
+        const earlier = st.atts.slice(0, -1).map(a => `${effective(a)} (${TERM_LABEL[a.term].replace("Semester", "Sem")} ${a.sy})`);
+        const rem = [st.key === "passed" || st.key === "nottaken" ? "" : st.label, taken ? "as " + taken.takenAs.split(" ").slice(0, 2).join(" ") : "", earlier.length ? "earlier: " + earlier.join("; ") : "", st.atts.some(a => a.comp) ? "INC completed" : ""].filter(Boolean).join(" · ");
+        return `<tr><td>${esc(c.code)}</td><td>${esc(c.title)}</td><td class="n">${c.units}</td><td class="n">${esc(st.key === "ongoing" ? "" : st.grade || "")}</td><td>${esc(rem)}</td></tr>`;
+      }).join("")}</tbody></table></div>`;
+  };
+  const body = `
+    <div class="info"><div><b>Name:</b> REYES, Ana</div><div><b>Student no.:</b> 23-1-01234</div><div><b>Program:</b> BS Computer Science</div>
+      <div><b>Curriculum:</b> ${CURRICULUM_NAME}</div><div><b>Adviser:</b> Prof. Mara Reyes</div><div><b>Year standing:</b> ${YEAR_LABEL[sm.standing]}</div></div>
+    <div class="sumrow"><span><b>Units earned:</b> ${sm.earned} of ${sm.total}</span><span><b>Remaining:</b> ${sm.total - sm.earned}</span><span><b>GWA:</b> ${sm.gwa}</span><span><b>Deficiencies:</b> ${sm.deficiencies.map(c => c.code).join(", ") || "none"}</span></div>
+    <div class="grid2">${groups.filter(g => g.year <= 3).map(slot).join("")}</div>`;
+  const body2 = `
+    <div class="cont">REYES, Ana · 23-1-01234 · Program checklist (continued)</div>
+    <div class="grid2">${groups.filter(g => g.year > 3).map(slot).join("")}</div>
+    <div class="sig"><div><div class="line">Prof. Mara Reyes</div>Prepared by: Academic Adviser</div><div><div class="line">Dr. Leo Santos</div>Noted by: Department Head</div></div>`;
+  return sheet("PROGRAM CHECKLIST", [body, body2]);
+}
+function reportPdf() {
+  const scope = acting === "dean" ? "Faculty of Computing · all departments" : acting === "head" ? "Department of Computer Science and Technology" : "Advisees of " + ROLES[role].name;
+  const dist = [["1.00–1.50", 34], ["1.75–2.25", 41], ["2.50–3.00", 18], ["5.00", 4], ["INC / DR / NA", 3]];
+  const body = `
+    <div class="info"><div><b>Scope:</b> ${scope}</div><div><b>Term:</b> 2025–2026 2nd Semester</div><div><b>Students:</b> ${acting === "adviser" ? 5 : 359}</div></div>
+    <div class="grid2">
+      <div><div class="slot-h"><span>Final grade distribution</span></div><table><thead><tr><th>Grade range</th><th class="n">Share</th><th>&nbsp;</th></tr></thead><tbody>${dist.map(([l, p]) => `<tr><td>${l}</td><td class="n">${p}%</td><td><div style="height:7px;width:${p * 2}%;background:${l.startsWith("5") || l.startsWith("INC") ? "#FDC530" : "#146939"}"></div></td></tr>`).join("")}</tbody></table></div>
+      <div><div class="slot-h"><span>GWA by batch and curriculum version</span></div><table><thead><tr><th>Batch</th><th>Curriculum</th><th class="n">Students</th><th class="n">Mean GWA</th></tr></thead><tbody>
+        <tr><td>2022</td><td>BSCS 2018–2024</td><td class="n">88</td><td class="n">1.95</td></tr><tr><td>2023</td><td>BSCS 2025–present</td><td class="n">96</td><td class="n">2.02</td></tr><tr><td>2024</td><td>BSCS 2025–present</td><td class="n">101</td><td class="n">2.06</td></tr></tbody></table></div>
+    </div>`;
+  return sheet("GRADE DISTRIBUTION AND GWA REPORT", [body]);
+}
+// Scale the A4 sheet to the window width (never below 30%), and again on resize
+function fitPdf() {
+  const bg = $("#pdfBg");
+  if (bg) bg.style.setProperty("--s", Math.max(0.3, Math.min(1, (document.documentElement.clientWidth - 32) / 794)));
+}
+window.addEventListener("resize", fitPdf);
+window.openPdf = kind => {
+  let bg = $("#pdfBg");
+  if (!bg) { bg = document.createElement("div"); bg.id = "pdfBg"; bg.className = "pdf-bg"; document.body.appendChild(bg); }
+  fitPdf();
+  bg.innerHTML = `<div class="pdf-bar"><span>PDF preview · A4 · ${kind === "checklist" ? "Program checklist" : "Report"}</span><span class="row-actions"><button class="btn small" onclick="toast('PDF downloaded (prototype)')">Download</button><button class="btn secondary small" onclick="$('#pdfBg').classList.remove('show')">Close</button></span></div>${kind === "checklist" ? checklistPdf() : reportPdf()}`;
+  bg.classList.add("show");
+  bg.scrollTop = 0;
+};
+
+// Route is kept in a variable (and mirrored to the URL hash when possible) so navigation also works where the hash can't change.
+let route = location.hash.replace(/^#\/?/, "");
+function render() {
+  const [screen, tab] = (route || "").split("/");
+  if (role === "signin") {
+    $("#app").innerHTML = `<div class="signin"><div class="logo-ph">VSU logo</div><h1>SAAIS</h1><p class="sub">Student Academic Advising Information System<br>Department of Computer Science and Technology</p>
+      <button class="gbtn" onclick="setRole('student')"><span style="font-weight:700;color:#4285F4">G</span> Sign in with your VSU Google account</button>
+      <p class="hint" style="margin-top:14px">Only @vsu.edu.ph accounts registered in SAAIS can sign in.</p></div>`;
+    return;
+  }
+  const r = ROLES[role], cur = screen && S[screen] ? screen : DEFAULT[role][1];
+  if (!r.groups.includes(acting)) acting = DEFAULT[role][0];
+  const nav = r.groups.map(g => `<div class="group">${NAV[g].label}</div>` + NAV[g].items.map(([k, l]) => `<a href="#/${k}" data-g="${g}" class="${k === cur && g === acting ? "active" : ""}">${l}</a>`).join("")).join("");
+  $("#app").innerHTML = `
+    <header class="app">
+      <button class="icon-btn" id="menuBtn" aria-label="Menu" onclick="document.querySelector('nav.side').classList.toggle('open')">☰</button>
+      <div class="logo-ph">VSU logo</div>
+      <div class="brand">SAAIS<small>Student Academic Advising · DCST</small></div>
+      <div class="spacer"></div>
+      <a class="icon-btn" href="#/notifications" aria-label="Notifications">🔔<span class="badge-count">3</span></a>
+      <div class="user-chip">${esc(r.name)}<small>${esc(r.sub)}</small></div>
+      <button class="icon-btn" onclick="setRole('signin')" style="font-size:13px">Sign out</button>
+    </header>
+    <div class="shell"><nav class="side">${nav}</nav><main>${S[cur]({ role: acting, tab, viewer: role === "student" ? "student" : "adviser" })}</main></div>`;
+}
+window.go = s => { route = s; try { history.replaceState(null, "", "#/" + s); } catch (e) {} render(); window.scrollTo(0, 0); };
+window.setRole = r => { role = r; $("#roleSel").value = r; if (r !== "signin") acting = DEFAULT[r][0]; go(r === "signin" ? "" : DEFAULT[r][1]); };
+$("#roleSel").addEventListener("change", e => setRole(e.target.value));
+document.addEventListener("click", e => {
+  const a = e.target.closest('a[href^="#/"]');
+  if (!a) return;
+  e.preventDefault();
+  if (a.dataset.g) acting = a.dataset.g;
+  go(a.getAttribute("href").slice(2));
+});
+window.addEventListener("hashchange", () => { route = location.hash.replace(/^#\/?/, ""); render(); });
+render();
+</script>
+</body>
+</html>
