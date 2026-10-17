@@ -1,1 +1,1 @@
-self.__SSG_MANIFEST=new Set([]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()
+self.__SSG_MANIFEST=new Set(["\u002Fadviser\u002Fadvisees\u002F[studentId]","\u002Fdean\u002Fstudents\u002F[studentId]","\u002Fdepartment-head\u002Fstudents\u002F[studentId]"]);self.__SSG_MANIFEST_CB&&self.__SSG_MANIFEST_CB()
